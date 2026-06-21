@@ -1,10 +1,20 @@
 import { Router } from "express";
+import db from "../../db/database.js";
 const router = Router();
 
 // GET /api/exercises
-router.get("/", (req, res) => {
-  res.json({ message: "exercises route" });
+router.get("/", async (req, res) => {
+  try {
+    const exercises = await db.prepare("SELECT * FROM exercises;").all();
+    return res.status(200).json({ data: exercises });
+  } catch (e) {
+    return res.status(500).json({ error: e });
+  }
 });
+
+// router.post("/", async (req, res) => {
+//   const {name, bodyPart, equipmentType, isCustom, userId} = req.body;
+// });
 
 export default router;
 

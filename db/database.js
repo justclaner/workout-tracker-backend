@@ -15,3 +15,26 @@ const schema = readFileSync(join(__dirname, "schema.sql"), "utf8");
 db.exec(schema);
 
 export default db;
+
+// Replace the above code with this to switch to a real MySQL Database
+// import mysql from "mysql2/promise";
+
+// const db = mysql.createPool({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASSWORD,
+//   database: process.env.DB_NAME,
+//   port: process.env.DB_PORT || 3306,
+// });
+
+// // Verify connection
+// try {
+//   const conn = await db.getConnection();
+//   console.log("Database connected.");
+//   conn.release();
+// } catch (err) {
+//   console.error("Failed to connect to database:", err.message);
+//   process.exit(1);
+// }
+
+// export default db;

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import db from "../../db/database.js";
 const router = Router();
 
 // GET /api/sessions
