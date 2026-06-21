@@ -21,10 +21,10 @@ router.get("/", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
-    if (!email) {
+    if (email == undefined) {
       return res.status(400).json({ error: "email is required!" });
     }
-    if (!password) {
+    if (password == undefined) {
       return res.status(400).json({ error: "password is required!" });
     }
     const hashedPassword = await hashString(password, 12);
@@ -41,15 +41,17 @@ router.post("/", async (req, res, next) => {
 router.post("/auth", async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
-    if (!email) {
+    if (email == undefined) {
       return res.status(400).json({ error: "email is required!" });
     }
-    if (!password) {
+    if (password == undefined) {
       return res.status(400).json({ error: "password is required!" });
     }
 
-    const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
-    if (!user) {
+    const user = await db
+      .prepare(`SELECT * FROM users WHERE email = ?`)
+      .get(email);
+    if (user == undefined) {
       return res.status(401).json({ error: "Invalid email or password!" });
     }
 

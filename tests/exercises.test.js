@@ -70,7 +70,7 @@ describe("POST /api/exercises", () => {
       userId: 99999,
     });
 
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
     expect(res.body.error).toMatch(/does not exist/i);
   });
 });

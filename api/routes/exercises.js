@@ -9,7 +9,7 @@ router.get("/", async (req, res, next) => {
     const exercises = await db.prepare("SELECT * FROM exercises;").all();
     return res.status(200).json({ data: exercises });
   } catch (e) {
-    return res.status(500).json({ error: e });
+    next(e);
   }
 });
 
@@ -27,18 +27,20 @@ router.post("/", async (req, res, next) => {
     if (!userId) {
       return res.status(400).json({ error: "userId is required!" });
     }
-    const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(userId);
-    if (!user) {
+    const user = await db
+      .prepare(`SELECT * FROM users WHERE id = ?`)
+      .get(userId);
+    if (user == undefined) {
       return res
-        .status(400)
+        .status(404)
         .json({ error: `User with userId ${userId} does not exist!` });
     }
 
-    if (!name) {
+    if (name == undefined) {
       return res.status(400).json({ error: "name is required!" });
     }
 
-    if (!bodyPart) {
+    if (bodyPart == undefined) {
       return res.status(400).json({ error: "bodyPart is required!" });
     }
     if (!BODY_PARTS.has(bodyPart)) {
@@ -47,7 +49,7 @@ router.post("/", async (req, res, next) => {
         .json({ error: `bodyPart ${bodyPart} is not a valid body part!` });
     }
 
-    if (!equipmentType) {
+    if (equipmentType == undefined) {
       return res.status(400).json({ error: "equipmentType is required!" });
     }
     if (!EQUIPMENT_TYPES.has(equipmentType)) {
