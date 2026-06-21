@@ -62,6 +62,8 @@ router.post("/", async (req, res, next) => {
         .json({ error: `isCustom ${isCustom} is not a boolean!` });
     }
 
+    const isCustomValue = isCustom ? 1 : 0;
+
     const insertCommand = db
       .prepare(
         `
@@ -69,7 +71,7 @@ router.post("/", async (req, res, next) => {
       VALUES (?, ?, ?, ?, ?, ?)
       `,
       )
-      .run(name, bodyPart, equipmentType, isCustom, userId, notes);
+      .run(name, bodyPart, equipmentType, isCustomValue, userId, notes);
 
     return res.status(200).json({ data: insertCommand });
   } catch (e) {
