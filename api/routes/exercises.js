@@ -12,10 +12,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// router.post("/", async (req, res) => {
-//   const {name, bodyPart, equipmentType, isCustom, userId} = req.body;
-// });
-
 export default router;
 
 // When using SQLite
