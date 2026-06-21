@@ -5,7 +5,9 @@ import { hash } from "bcrypt";
 import bcrypt from "bcrypt";
 const router = Router();
 
-// GET /api/users
+// Route: /api/users
+
+// Get all the users
 router.get("/", async (req, res, next) => {
   try {
     const users = await db.prepare("SELECT * FROM users;").all();
@@ -15,14 +17,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// Make a user
 router.post("/", async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
     if (!email) {
-      return res.status(400).json({ error: "An email is required!" });
+      return res.status(400).json({ error: "email is required!" });
     }
     if (!password) {
-      return res.status(400).json({ error: "A password is required!" });
+      return res.status(400).json({ error: "password is required!" });
     }
     const hashedPassword = await hashString(password, 12);
     const insertCommand = await db
@@ -34,14 +37,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// Authenticate a user
 router.post("/auth", async (req, res, next) => {
   try {
     const { email, password } = req.body || {};
     if (!email) {
-      return res.status(400).json({ error: "An email is required!" });
+      return res.status(400).json({ error: "email is required!" });
     }
     if (!password) {
-      return res.status(400).json({ error: "A password is required!" });
+      return res.status(400).json({ error: "password is required!" });
     }
 
     const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(email);
@@ -62,12 +66,13 @@ router.post("/auth", async (req, res, next) => {
   }
 });
 
+// Delete a user
 router.delete("/:userId", async (req, res, next) => {
   try {
     const { userId } = req.params;
     const deleteCommand = await db
-      .prepare(`DELETE FROM users WHERE id = ${userId}`)
-      .run();
+      .prepare(`DELETE FROM users WHERE id = ?`)
+      .run(userId);
     return res.status(200).json({ data: deleteCommand });
   } catch (e) {
     return res.status(500).json({ error: e });

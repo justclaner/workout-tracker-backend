@@ -5,7 +5,8 @@ import { dirname, join } from "path";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const db = new Database(join(__dirname, "workout.db"));
+const dbFile = process.env.NODE_ENV === "test" ? "test.db" : "workout.db";
+const db = new Database(join(__dirname, dbFile));
 
 // Enable foreign keys (SQLite has them off by default)
 db.pragma("foreign_keys = ON");
