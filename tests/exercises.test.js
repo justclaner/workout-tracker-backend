@@ -2,14 +2,12 @@ import { describe, it, expect } from "vitest";
 import request from "supertest";
 import app from "../api/app.js";
 
-let userCounter = 0;
-async function createTestUser() {
-  userCounter++;
-  const res = await request(app)
-    .post("/api/users")
-    .send({ email: `test${userCounter}@example.com`, password: "password123" });
-  return res.body.data.lastInsertRowid;
-}
+import { createTestUser } from "./helpers.js";
+import { GLOBAL_EXERCISES } from "../api/util/constants.js";
+
+import { generateRandomString } from "./helpers.js";
+
+const GLOBAL_EXERCISES_ARR = [...GLOBAL_EXERCISES];
 
 describe("GET /api/exercises", () => {
   it("returns an array", async () => {
@@ -30,7 +28,7 @@ describe("POST /api/exercises", () => {
       userId,
     });
 
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(201);
     expect(res.body.data.lastInsertRowid).toBeDefined();
   });
 
@@ -72,6 +70,30 @@ describe("POST /api/exercises", () => {
 
     expect(res.status).toBe(404);
     expect(res.body.error).toMatch(/does not exist/i);
+  });
+
+  it("accepts a null userId with valid global exercise", async () => {
+    const { name, body_part, equipment_type } = GLOBAL_EXERCISES_ARR[0];
+    const res = await request(app).post("/api/exercises").send({
+      name,
+      bodyPart: body_part,
+      equipmentType: equipment_type,
+      userId: null,
+    });
+
+    expect(res.status).toBe(201);
+  });
+
+  it("rejects a null userId with invalid body part", async () => {
+    const { body_part, equipment_type } = GLOBAL_EXERCISES_ARR[0];
+    const res = await request(app).post("/api/exercises").send({
+      name: "asdlfjas;dlfja",
+      bodyPart: body_part,
+      equipmentType: equipment_type,
+      userId: null,
+    });
+
+    expect(res.status).toBe(400);
   });
 });
 

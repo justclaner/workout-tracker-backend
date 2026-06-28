@@ -1,6 +1,10 @@
 import { Router } from "express";
 import db from "../../db/database.js";
-import { BODY_PARTS, EQUIPMENT_TYPES } from "../util/constants.js";
+import {
+  BODY_PARTS,
+  EQUIPMENT_TYPES,
+  GLOBAL_EXERCISES,
+} from "../util/constants.js";
 const router = Router();
 
 // GET /api/exercises
@@ -13,7 +17,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// Makes user-defined exercise
+// Makes exercise
 router.post("/", async (req, res, next) => {
   try {
     const {
@@ -21,23 +25,32 @@ router.post("/", async (req, res, next) => {
       bodyPart,
       equipmentType,
       isCustom = false,
-      userId,
+      userId = null,
       notes = "",
     } = req.body || {};
-    if (!userId) {
-      return res.status(400).json({ error: "userId is required!" });
-    }
-    const user = await db
-      .prepare(`SELECT * FROM users WHERE id = ?`)
-      .get(userId);
-    if (user == undefined) {
-      return res
-        .status(404)
-        .json({ error: `User with userId ${userId} does not exist!` });
+
+    if (userId != null) {
+      const user = await db
+        .prepare(`SELECT * FROM users WHERE id = ?`)
+        .get(userId);
+      if (user == undefined) {
+        return res
+          .status(404)
+          .json({ error: `User with userId ${userId} does not exist!` });
+      }
     }
 
     if (name == undefined) {
       return res.status(400).json({ error: "name is required!" });
+    }
+
+    if (
+      userId == null &&
+      GLOBAL_EXERCISES.find((exercise) => exercise.name == name) == undefined
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Global exercise with invalid name!" });
     }
 
     if (bodyPart == undefined) {
@@ -75,7 +88,7 @@ router.post("/", async (req, res, next) => {
       )
       .run(name, bodyPart, equipmentType, isCustomValue, userId, notes);
 
-    return res.status(200).json({ data: insertCommand });
+    return res.status(201).json({ data: insertCommand });
   } catch (e) {
     next(e);
   }
