@@ -37,6 +37,24 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+// Get a specific user
+router.get("/:userId", async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await db
+      .prepare(`SELECT * FROM users WHERE id = ?`)
+      .get(userId);
+    if (user == undefined) {
+      return res
+        .status(404)
+        .json({ error: `User with userId ${userId} does not exist!` });
+    }
+    return res.status(200).json({ data: user });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Authenticate a user
 router.post("/auth", async (req, res, next) => {
   try {

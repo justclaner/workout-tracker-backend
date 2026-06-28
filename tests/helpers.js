@@ -97,8 +97,10 @@ export const createTestSessionExercise = async (
 ) => {
   sessionExerciseCounter++;
   const res = await request(app)
-    .post(`/api/sessions/${sessionId}/${exerciseId}`)
+    .post(`/api/session-exercises`)
     .send({
+      sessionId,
+      exerciseId,
       ...overrides,
     });
   return res.body.data.lastInsertRowid;
