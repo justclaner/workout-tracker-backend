@@ -10,8 +10,25 @@ const router = Router();
 // GET /api/exercises
 router.get("/", async (req, res, next) => {
   try {
-    const exercises = await db.prepare("SELECT * FROM exercises;").all();
+    const exercises = await db.prepare(`SELECT * FROM exercises;`).all();
     return res.status(200).json({ data: exercises });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get("/:exerciseId", async (req, res, next) => {
+  try {
+    const { exerciseId } = req.params;
+    const exercise = await db
+      .prepare(`SELECT * FROM exercises WHERE id = ?`)
+      .get(exerciseId);
+    if (exercise == undefined) {
+      return res
+        .status(404)
+        .json({ error: `Exercise with id ${exerciseId} does not exist!` });
+    }
+    return res.status(200).json({ data: exercise });
   } catch (e) {
     next(e);
   }

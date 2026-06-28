@@ -14,6 +14,23 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/:sessionId", async (req, res, next) => {
+  try {
+    const { sessionId } = req.params;
+    const session = await db
+      .prepare(`SELECT * FROM sessions WHERE id = ?`)
+      .get(sessionId);
+    if (session == undefined) {
+      return res
+        .status(404)
+        .json({ error: `Session with id ${sessionId} does not exist!` });
+    }
+    return res.status(200).json({ data: session });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Creates a new session, started_at will default to current time, ended_at should be NULL
 router.post("/", async (req, res, next) => {
   try {

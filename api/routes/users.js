@@ -47,7 +47,7 @@ router.get("/:userId", async (req, res, next) => {
     if (user == undefined) {
       return res
         .status(404)
-        .json({ error: `User with userId ${userId} does not exist!` });
+        .json({ error: `User with id ${userId} does not exist!` });
     }
     return res.status(200).json({ data: user });
   } catch (e) {

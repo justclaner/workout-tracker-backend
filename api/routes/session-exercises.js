@@ -15,6 +15,25 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/:sessionExerciseId", async (req, res, next) => {
+  try {
+    const { sessionExerciseId } = req.params;
+    const sessionExercise = await db
+      .prepare(`SELECT * FROM session_exercises WHERE id = ?`)
+      .get(sessionExerciseId);
+    if (sessionExercise == undefined) {
+      return res
+        .status(404)
+        .json({
+          error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
+        });
+    }
+    return res.status(200).json({ data: sessionExercise });
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Create a session exercise
 router.post("/", async (req, res, next) => {
   try {
@@ -71,6 +90,18 @@ router.post("/", async (req, res, next) => {
       .run(sessionId, exerciseId, maxOrderIndex + 1);
 
     return res.status(201).json({ data: insertCommand });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.delete("/:sessionExerciseId", async (req, res, next) => {
+  try {
+    const { sessionExerciseId } = req.params;
+    const deleteCommand = await db
+      .prepare(`DELETE FROM session_exercises WHERE id = ?`)
+      .run(sessionExerciseId);
+    return res.status(200).json({ data: deleteCommand });
   } catch (e) {
     next(e);
   }

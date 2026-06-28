@@ -13,6 +13,21 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/:setId", async (req, res, next) => {
+  try {
+    const { setId } = req.params;
+    const set = await db.prepare(`SELECT * FROM sets WHERE id = ?`).get(setId);
+    if (set == undefined) {
+      return res
+        .status(404)
+        .json({ error: `Set with id ${setId} does not exist!` });
+    }
+    return res.status(200).json({ data: set });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.post("/:sessionExerciseId", async (req, res, next) => {
   try {
     const { sessionExerciseId } = req.params;
@@ -66,6 +81,18 @@ router.post("/:sessionExerciseId", async (req, res, next) => {
         isWarmupValue,
       );
     return res.status(201).json({ data: insertCommand });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.delete("/:setId", async (req, res, next) => {
+  try {
+    const { setId } = req.params;
+    const deleteCommand = await db
+      .prepare(`DELETE FROM sets WHERE id = ?`)
+      .run(setId);
+    return res.status(200).json({ data: deleteCommand });
   } catch (e) {
     next(e);
   }
