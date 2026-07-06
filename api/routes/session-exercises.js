@@ -22,11 +22,9 @@ router.get("/:sessionExerciseId", async (req, res, next) => {
       .prepare(`SELECT * FROM session_exercises WHERE id = ?`)
       .get(sessionExerciseId);
     if (sessionExercise == undefined) {
-      return res
-        .status(404)
-        .json({
-          error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
-        });
+      return res.status(404).json({
+        error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
+      });
     }
     return res.status(200).json({ data: sessionExercise });
   } catch (e) {
@@ -90,6 +88,42 @@ router.post("/", async (req, res, next) => {
       .run(sessionId, exerciseId, maxOrderIndex + 1);
 
     return res.status(201).json({ data: insertCommand });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Reorder the order_index
+router.patch("/:sessionExerciseId", async (req, res, next) => {
+  try {
+    const { sessionExerciseId } = req.params;
+    const { orderIndex } = req.body || {};
+    const sessionExercise = await db
+      .prepare(`SELECT * FROM session_exercises WHERE id = ?`)
+      .get(sessionExerciseId);
+    if (sessionExercise == undefined) {
+      return res.status(404).json({
+        error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
+      });
+    }
+
+    if (orderIndex == undefined) {
+      return res.status(400).json({
+        error: `orderIndex is required!`,
+      });
+    }
+
+    const updateCommand = await db
+      .prepare(
+        `
+				UPDATE session_exercises 
+				SET order_index = ? 
+				WHERE id = ?;
+			`,
+      )
+      .run(orderIndex, sessionExerciseId);
+
+    return res.status(200).json({ data: updateCommand });
   } catch (e) {
     next(e);
   }
