@@ -26,14 +26,14 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS session_exercises (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  session_id INTEGER NOT NULL REFERENCES sessions(id),
+  session_id INTEGER NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
   exercise_id INTEGER NOT NULL REFERENCES exercises(id),
   order_index INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sets (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  session_exercise_id INTEGER NOT NULL REFERENCES session_exercises(id),
+  session_exercise_id INTEGER NOT NULL REFERENCES session_exercises(id) ON DELETE CASCADE,
   set_number INTEGER NOT NULL,
   weight DECIMAL(6,2),
   reps INTEGER,
