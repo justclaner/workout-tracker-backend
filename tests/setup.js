@@ -1,3 +1,5 @@
+// This file has been configured in vitest.config.js
+
 import db from "../db/database.js";
 import { beforeEach } from "vitest";
 

@@ -10,6 +10,7 @@ let userCounter = 0;
 let exerciseCounter = 0;
 let sessionCounter = 0;
 let sessionExerciseCounter = 0;
+let setCounter = 0;
 
 const BODY_PARTS_ARR = [...BODY_PARTS];
 const EQUIPMENT_TYPES_ARR = [...EQUIPMENT_TYPES];
@@ -57,6 +58,21 @@ export const createTestExercise = async (userId, overrides = {}) => {
   return res.body.data.lastInsertRowid;
 };
 
+export const createTestGlobalExercise = async (name) => {
+  const globalDef = GLOBAL_EXERCISES.find((ex) => ex.name === name);
+  if (!globalDef) {
+    throw new Error(`"${name}" is not in GLOBAL_EXERCISES`);
+  }
+  const res = await request(app).post("/api/exercises").send({
+    name: globalDef.name,
+    bodyPart: globalDef.body_part,
+    equipmentType: globalDef.equipment_type,
+    isCustom: false,
+    userId: null,
+  });
+  return res.body.data.lastInsertRowid;
+};
+
 export const initializeGlobalExercises = async () => {
   for (let i = 0; i < GLOBAL_EXERCISES.length; i++) {
     const { name, body_part, equipment_type } = GLOBAL_EXERCISES_ARR[i];
@@ -69,7 +85,7 @@ export const initializeGlobalExercises = async () => {
       userId: null,
     });
 
-    if (res.status != 200) {
+    if (res.status != 201) {
       throw new Error(
         `Failed to create global exercise "${name}": ${res.body.error}`,
       );
@@ -101,6 +117,20 @@ export const createTestSessionExercise = async (
     .send({
       sessionId,
       exerciseId,
+      ...overrides,
+    });
+  return res.body.data.lastInsertRowid;
+};
+
+export const createTestSet = async (sessionExerciseId, overrides = {}) => {
+  setCounter++;
+  const res = await request(app)
+    .post(`/api/sets/${sessionExerciseId}`)
+    .send({
+      weight: randomNumber(45, 315),
+      reps: randomNumber(1, 12),
+      rpe: randomNumber(6, 10),
+      isWarmup: false,
       ...overrides,
     });
   return res.body.data.lastInsertRowid;
