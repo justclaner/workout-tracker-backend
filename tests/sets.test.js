@@ -327,13 +327,13 @@ describe("PATCH /api/sets/:setId", () => {
     const setId = await createTestSet(sessionExerciseId);
 
     const res = await request(app).patch(`/api/sets/${setId}`).send({
-      rpe: 1234,
+      rpe: 3,
     });
     expect(res.status).toBe(200);
 
     const set = await request(app).get(`/api/sets/${setId}`);
     expect(set.status).toBe(200);
-    expect(set.body.data.rpe).toBe(1234);
+    expect(set.body.data.rpe).toBe(3);
   });
 
   it("is_warmup is successfully updated (to true)", async () => {
