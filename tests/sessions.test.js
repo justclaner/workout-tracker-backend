@@ -102,7 +102,7 @@ describe("GET /api/sessions/:sessionId/full", () => {
 });
 
 describe("POST /api/sessions/", () => {
-  it("no user id throws an error", async () => {
+  it("no user id returns 400", async () => {
     const res = await request(app).post("/api/sessions").send({
       name: "random name",
       notes: "random notes",
@@ -110,7 +110,7 @@ describe("POST /api/sessions/", () => {
     expect(res.status).toBe(400);
   });
 
-  it("user not existing throws an error", async () => {
+  it("user not existing returns 404", async () => {
     const res = await request(app).post("/api/sessions").send({
       userId: 1,
       name: "random name",
@@ -119,7 +119,7 @@ describe("POST /api/sessions/", () => {
     expect(res.status).toBe(404);
   });
 
-  it("no name throws an error", async () => {
+  it("no name returns 400", async () => {
     const userId = await createTestUser();
     const res = await request(app).post("/api/sessions").send({
       userId: userId,
@@ -149,12 +149,12 @@ describe("POST /api/sessions/", () => {
 });
 
 describe("PATCH /api/sessions/:sessionId", () => {
-  it("session not existing throws an error", async () => {
+  it("session not existing returns 404", async () => {
     const res = await request(app).patch("/api/sessions/1").send({});
     expect(res.status).toBe(404);
   });
 
-  it("no name and no notes throws an error", async () => {
+  it("no name and no notes returns 400", async () => {
     const userId = await createTestUser();
     const sessionId = await createTestSession(userId);
     const res = await request(app).patch(`/api/sessions/${sessionId}`).send({});
@@ -201,7 +201,7 @@ describe("PATCH /api/sessions/:sessionId", () => {
 });
 
 describe("PATCH /api/sessions/:sessionId/end", () => {
-  it("session not existing throws an error", async () => {
+  it("session not existing returns 404", async () => {
     const res = await request(app).patch("/api/sessions/1/end").send({});
     expect(res.status).toBe(404);
   });
@@ -222,7 +222,7 @@ describe("PATCH /api/sessions/:sessionId/end", () => {
 });
 
 describe("DELETE /api/sessions/:sessionId", () => {
-  it("session not existing does not throw an error", async () => {
+  it("session not existing returns 200", async () => {
     const res = await request(app).delete("/api/sessions/1");
     expect(res.status).toBe(200);
   });
