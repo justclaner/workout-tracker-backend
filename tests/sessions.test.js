@@ -80,6 +80,7 @@ describe("GET /api/sessions/:sessionId/full", () => {
       id: sessionId,
       user_id: userId,
     });
+
     expect(res.body.data.exercises).toHaveLength(2);
     const exercises = res.body.data.exercises;
     for (let i = 0; i < exercises.length; i++) {
@@ -97,5 +98,142 @@ describe("GET /api/sessions/:sessionId/full", () => {
         });
       }
     }
+  });
+});
+
+describe("POST /api/sessions/", () => {
+  it("no user id throws an error", async () => {
+    const res = await request(app).post("/api/sessions").send({
+      name: "random name",
+      notes: "random notes",
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("user not existing throws an error", async () => {
+    const res = await request(app).post("/api/sessions").send({
+      userId: 1,
+      name: "random name",
+      notes: "random notes",
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("no name throws an error", async () => {
+    const userId = await createTestUser();
+    const res = await request(app).post("/api/sessions").send({
+      userId: userId,
+      notes: "random notes",
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("session is created successfully with all parameters", async () => {
+    const userId = await createTestUser();
+    const res = await request(app).post("/api/sessions").send({
+      userId: userId,
+      name: "random name",
+      notes: "random notes",
+    });
+    expect(res.status).toBe(201);
+  });
+
+  it("session is created successfully without providing notes", async () => {
+    const userId = await createTestUser();
+    const res = await request(app).post("/api/sessions").send({
+      userId: userId,
+      name: "random name",
+    });
+    expect(res.status).toBe(201);
+  });
+});
+
+describe("PATCH /api/sessions/:sessionId", () => {
+  it("session not existing throws an error", async () => {
+    const res = await request(app).patch("/api/sessions/1").send({});
+    expect(res.status).toBe(404);
+  });
+
+  it("no name and no notes throws an error", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    const res = await request(app).patch(`/api/sessions/${sessionId}`).send({});
+    expect(res.status).toBe(400);
+  });
+
+  it("giving name updates name", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    const res = await request(app).patch(`/api/sessions/${sessionId}`).send({
+      name: "abcdef1234",
+    });
+    expect(res.status).toBe(200);
+
+    const session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.body.data.name).toBe("abcdef1234");
+  });
+
+  it("giving notes updates notes", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    const res = await request(app).patch(`/api/sessions/${sessionId}`).send({
+      notes: "abcdef1234",
+    });
+    expect(res.status).toBe(200);
+
+    const session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.body.data.notes).toBe("abcdef1234");
+  });
+
+  it("giving name and notes updates both", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    const res = await request(app).patch(`/api/sessions/${sessionId}`).send({
+      name: "qwerty9876",
+      notes: "abcdef1234",
+    });
+    expect(res.status).toBe(200);
+
+    const session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.body.data.name).toBe("qwerty9876");
+    expect(session.body.data.notes).toBe("abcdef1234");
+  });
+});
+
+describe("PATCH /api/sessions/:sessionId/end", () => {
+  it("session not existing throws an error", async () => {
+    const res = await request(app).patch("/api/sessions/1/end").send({});
+    expect(res.status).toBe(404);
+  });
+
+  it("ended_at is successfully updated", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    let session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.status).toBe(200);
+    expect(session.body.data.ended_at).toBeNull();
+
+    const res = await request(app).patch(`/api/sessions/${sessionId}/end`);
+    expect(res.status).toBe(200);
+    session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.status).toBe(200);
+    expect(session.body.data.ended_at).not.toBeNull();
+  });
+});
+
+describe("DELETE /api/sessions/:sessionId", () => {
+  it("session not existing does not throw an error", async () => {
+    const res = await request(app).delete("/api/sessions/1");
+    expect(res.status).toBe(200);
+  });
+
+  it("session is successfully deleted", async () => {
+    const userId = await createTestUser();
+    const sessionId = await createTestSession(userId);
+    const res = await request(app).delete(`/api/sessions/${sessionId}`);
+    expect(res.status).toBe(200);
+
+    const session = await request(app).get(`/api/sessions/${sessionId}`);
+    expect(session.status).toBe(404);
   });
 });
