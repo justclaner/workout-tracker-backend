@@ -38,6 +38,15 @@ router.post("/:sessionExerciseId", async (req, res, next) => {
     const { sessionExerciseId } = req.params;
     const { weight, reps, rpe, isWarmup = false } = req.body || {};
 
+    const sessionExercise = await db
+      .prepare(`SELECT * FROM session_exercises WHERE id = ?`)
+      .get(sessionExerciseId);
+    if (sessionExercise == undefined) {
+      return res.status(404).json({
+        error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
+      });
+    }
+
     if (weight == undefined) {
       return res.status(400).json({ error: `weight is required!` });
     }
@@ -53,15 +62,6 @@ router.post("/:sessionExerciseId", async (req, res, next) => {
         .json({ error: `isWarmup ${isWarmup} is not a boolean!` });
     }
     const isWarmupValue = isWarmup ? 1 : 0;
-
-    const sessionExercise = await db
-      .prepare(`SELECT * FROM session_exercises WHERE id = ?`)
-      .get(sessionExerciseId);
-    if (sessionExercise == undefined) {
-      return res.status(404).json({
-        error: `Session Exercise with id ${sessionExerciseId} does not exist!`,
-      });
-    }
 
     const subquery = await db
       .prepare(
@@ -94,7 +94,7 @@ router.post("/:sessionExerciseId", async (req, res, next) => {
 router.patch("/:setId", async (req, res, next) => {
   try {
     const { setId } = req.params;
-    const { weight, reps, rpe, isWarmup } = req.body;
+    const { weight, reps, rpe, isWarmup } = req.body || {};
     const set = await db.prepare(`SELECT * FROM sets WHERE id = ?`).get(setId);
     if (set == undefined) {
       return res

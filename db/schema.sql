@@ -37,6 +37,6 @@ CREATE TABLE IF NOT EXISTS sets (
   set_number INTEGER NOT NULL,
   weight DECIMAL(6,2),
   reps INTEGER,
-  rpe DECIMAL(3,1),
+  rpe DECIMAL(3,1) CHECK (rpe >= 0 AND rpe <= 10),
   is_warmup BOOLEAN DEFAULT FALSE
 );
