@@ -54,6 +54,10 @@ router.get("/:exerciseId/history", async (req, res, next) => {
         .json({ error: `Exercise with id ${exerciseId} does not exist!` });
     }
 
+    if (userId == undefined) {
+      return res.status(400).json({ error: `userId is required!` });
+    }
+
     const user = await db
       .prepare(`SELECT * FROM users WHERE id = ?`)
       .get(userId);
@@ -72,7 +76,7 @@ router.get("/:exerciseId/history", async (req, res, next) => {
         sess.notes AS session_notes,
         sess.started_at AS started_at,
         sess.ended_at AS ended_at,
-        s.set_number AS set_number
+        s.set_number AS set_number,
         s.weight AS weight,
         s.reps AS reps,
         s.rpe AS rpe,
