@@ -185,7 +185,7 @@ router.patch("/:exerciseId", async (req, res, next) => {
         .status(404)
         .json({ error: `Exercise with id ${exerciseId} does not exist!` });
     }
-    if (!exercise.isCustom || exercise.user_id != null) {
+    if (!exercise.is_custom || exercise.user_id == null) {
       return res.status(400).json({
         error: `A global exercise can not be edited!`,
       });
@@ -256,22 +256,3 @@ router.delete("/:exerciseId", async (req, res, next) => {
 });
 
 export default router;
-// When using SQLite
-// router.get("/", async (req, res, next) => {
-//   try {
-//     const exercises = db.prepare("SELECT * FROM exercises").all();
-//     res.json(exercises);
-//   } catch (err) {
-//     next(err);
-//   }
-// });
-
-// When using MySQL
-// router.get("/", async (req, res, next) => {
-//   try {
-//     const [exercises] = await db.query("SELECT * FROM exercises");
-//     res.json(exercises);
-//   } catch (err) {
-//     next(err);
-//   }
-// });

@@ -227,23 +227,270 @@ describe("PATCH /api/exercises", () => {
       .send({});
     expect(res.status).toBe(400);
   });
+
+  it("name is updated successfully", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "asdf1234",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("asdf1234");
+  });
+
+  it("invalid body_part returns 400", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        bodyPart: "asdf",
+      });
+    expect(res.status).toBe(400);
+  });
+
+  it("body_part is updated successfully", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        bodyPart: "chest",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.body_part).toBe("chest");
+  });
+
+  it("invalid equipment_type returns 400", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        equipmentType: "asdf",
+      });
+    expect(res.status).toBe(400);
+  });
+
+  it("equipment_type is updated successfully", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        equipmentType: "cable",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.equipment_type).toBe("cable");
+  });
+
+  it("notes is updated successfully", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
+
+  it("a combination of 2 fields provided updates successfully (1)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
+
+  it("a combination of 2 fields provided updates successfully (2)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        equipmentType: "bodyweight",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.equipment_type).toBe("bodyweight");
+  });
+
+  it("a combination of 2 fields provided updates successfully (3)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        equipmentType: "bodyweight",
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.equipment_type).toBe("bodyweight");
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
+
+  it("a combination of 3 fields provided updates successfully (1)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        bodyPart: "arms",
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.body_part).toBe("arms");
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
+
+  it("a combination of 3 fields provided updates successfully (2)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        equipmentType: "bodyweight",
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.equipment_type).toBe("bodyweight");
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
+
+  it("a combination of 3 fields provided updates successfully (3)", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        bodyPart: "arms",
+        equipmentType: "bodyweight",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.body_part).toBe("arms");
+    expect(exercise.body.data.equipment_type).toBe("bodyweight");
+  });
+
+  it("all fields provided updates all of them", async () => {
+    const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
+
+    const res = await request(app)
+      .patch(`/api/exercises/${customExerciseId}`)
+      .send({
+        name: "qwerty1234",
+        bodyPart: "arms",
+        equipmentType: "bodyweight",
+        notes: "asdfasdfasdf",
+      });
+    expect(res.status).toBe(200);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(200);
+    expect(exercise.body.data.name).toBe("qwerty1234");
+    expect(exercise.body.data.body_part).toBe("arms");
+    expect(exercise.body.data.equipment_type).toBe("bodyweight");
+    expect(exercise.body.data.notes).toBe("asdfasdfasdf");
+  });
 });
 
 describe("DELETE /api/exercises/:exerciseId", () => {
+  it("exercise not existing returns 200", async () => {
+    const res = await request(app).delete("/api/exercises/1");
+    expect(res.status).toBe(200);
+  });
+
   it("deletes an exercise", async () => {
     const userId = await createTestUser();
+    const customExerciseId = await createTestExercise(userId);
 
-    const createRes = await request(app).post("/api/exercises").send({
-      name: "Temp Exercise",
-      bodyPart: "core",
-      equipmentType: "bodyweight",
-      userId,
-    });
-
-    const exerciseId = createRes.body.data.lastInsertRowid;
-
-    const res = await request(app).delete(`/api/exercises/${exerciseId}`);
+    const res = await request(app).delete(`/api/exercises/${customExerciseId}`);
     expect(res.status).toBe(200);
-    expect(res.body.data.changes).toBe(1);
+
+    const exercise = await request(app).get(
+      `/api/exercises/${customExerciseId}`,
+    );
+    expect(exercise.status).toBe(404);
   });
 });
