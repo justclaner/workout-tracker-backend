@@ -71,7 +71,7 @@ describe("PATCH /api/users", () => {
       email: email,
       password: "abc1234",
     });
-    console.log(res2);
+
     expect(res2.status).toBe(200);
     expect(res2.body.data.success).toBe(true);
   });
